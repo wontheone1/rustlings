@@ -10,16 +10,16 @@
 // No boiler plate code this time,
 // you can do this!
 
-// I AM NOT DONE
-
 trait AppendBar {
     fn append_bar(self) -> Self;
 }
 
-//TODO: Add your code here
-
-
-
+impl AppendBar for Vec<String> {
+    fn append_bar(mut self:Vec<String>) -> Self {
+        self.push(String::from("Bar"));
+        self
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -33,3 +33,9 @@ mod tests {
     }
 
 }
+
+// Notice how the trait takes ownership of 'self',and returns `Self'.
+// Try mutating the incoming string vector.
+//
+// Vectors provide suitable methods for adding an element at the end. See
+// the documentation at: https://doc.rust-lang.org/std/vec/struct.Vec.html
