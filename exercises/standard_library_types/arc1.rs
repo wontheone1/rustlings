@@ -4,17 +4,16 @@
 // somewhere. Try not to create any copies of the `numbers` Vec!
 // Execute `rustlings hint arc1` for hints :)
 
-// I AM NOT DONE
-
 use std::sync::Arc;
 use std::thread;
 
 fn main() {
     let numbers: Vec<_> = (0..100u32).collect();
-    let shared_numbers = // TODO
-    let mut joinhandles = Vec::new();
+    let shared_numbers = Arc::new(numbers);//
+    let mut joinhandles: Vec<thread::JoinHandle<()>> = Vec::new();
 
     for offset in 0..8 {
+        let child_numbers = shared_numbers.clone();
         joinhandles.push(thread::spawn(move || {
             let mut i = offset;
             let mut sum = 0;
@@ -26,6 +25,13 @@ fn main() {
         }));
     }
     for handle in joinhandles.into_iter() {
-        handle.join().unwrap();
+        println!("Joining thread {:?}", handle.join().unwrap());
     }
 }
+
+// Make `shared_numbers` be an `Arc` from the numbers vector. Then, in order
+// to avoid creating a copy of `numbers`, you'll need to create `child_numbers`
+// inside the loop but still in the main thread.
+//
+// `child_numbers` should be a clone of the Arc of the numbers instead of a
+// thread-local copy of the numbers.
