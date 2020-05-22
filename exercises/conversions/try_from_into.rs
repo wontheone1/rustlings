@@ -11,8 +11,6 @@ struct Color {
     blue: u8,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
 // You need create implementation for a tuple of three integer,
@@ -22,10 +20,26 @@ struct Color {
 // but slice implementation need check slice length!
 // Also note, that chunk of correct rgb color must be integer in range 0..=255.
 
+fn u16_to_u8(n: i16) -> Result<u8, String> {
+    if n >= 0 && n < 256 {
+        Ok(n as u8)
+    } else {
+        Err("out of range".to_string())
+    }
+}
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = String;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let red = u16_to_u8(tuple.0)?;
+        let green = u16_to_u8(tuple.1)?;
+        let blue = u16_to_u8(tuple.2)?;
+        Ok(Color {
+            red,
+            green,
+            blue,
+        })
     }
 }
 
@@ -33,6 +47,14 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = String;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let red = u16_to_u8(arr[0])?;
+        let green = u16_to_u8(arr[1])?;
+        let blue = u16_to_u8(arr[2])?;
+        Ok(Color {
+            red,
+            green,
+            blue,
+        })
     }
 }
 
@@ -40,6 +62,17 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = String;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err("slice length not 3".to_string());
+        }
+        let red = u16_to_u8(slice[0])?;
+        let green = u16_to_u8(slice[1])?;
+        let blue = u16_to_u8(slice[2])?;
+        Ok(Color {
+            red,
+            green,
+            blue,
+        })
     }
 }
 
@@ -70,11 +103,13 @@ mod tests {
     fn test_tuple_out_of_range_positive() {
         let _ = Color::try_from((256, 1000, 10000)).unwrap();
     }
+
     #[test]
     #[should_panic]
     fn test_tuple_out_of_range_negative() {
         let _ = Color::try_from((-1, -10, -256)).unwrap();
     }
+
     #[test]
     fn test_tuple_correct() {
         let c: Color = (183, 65, 14).try_into().unwrap();
@@ -88,11 +123,13 @@ mod tests {
     fn test_array_out_of_range_positive() {
         let _: Color = [1000, 10000, 256].try_into().unwrap();
     }
+
     #[test]
     #[should_panic]
     fn test_array_out_of_range_negative() {
         let _: Color = [-10, -256, -1].try_into().unwrap();
     }
+
     #[test]
     fn test_array_correct() {
         let c: Color = [183, 65, 14].try_into().unwrap();
@@ -107,12 +144,14 @@ mod tests {
         let arr = [10000, 256, 1000];
         let _ = Color::try_from(&arr[..]).unwrap();
     }
+
     #[test]
     #[should_panic]
     fn test_slice_out_of_range_negative() {
         let arr = [-256, -1, -10];
         let _ = Color::try_from(&arr[..]).unwrap();
     }
+
     #[test]
     fn test_slice_correct() {
         let v = vec![183, 65, 14];
@@ -121,6 +160,7 @@ mod tests {
         assert_eq!(c.green, 65);
         assert_eq!(c.blue, 14);
     }
+
     #[test]
     #[should_panic]
     fn test_slice_excess_length() {
